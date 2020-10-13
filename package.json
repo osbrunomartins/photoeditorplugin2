@@ -1,0 +1,17 @@
+{
+  "name": "com.outsystems.photoeditorplugin2",
+  "version": "0.0.1",
+  "description": "",
+  "cordova": {
+    "id": "com.outsystems.photoeditorplugin2",
+    "platforms": [
+      "android"
+    ]
+  },
+  "keywords": [
+    "ecosystem:cordova",
+    "cordova-android"
+  ],
+  "author": "Bruno Martins",
+  "license": "ISC"
+}
