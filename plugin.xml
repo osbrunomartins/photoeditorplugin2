@@ -1,0 +1,25 @@
+<?xml version='1.0' encoding='utf-8'?>
+<plugin id="com.outsystems.photoeditorplugin2" version="0.0.1" xmlns="http://apache.org/cordova/ns/plugins/1.0" xmlns:android="http://schemas.android.com/apk/res/android">
+    <name>PhotoEditorPlugin2</name>
+    <js-module name="PhotoEditorPlugin2" src="www/PhotoEditorPlugin2.js">
+        <clobbers target="cordova.plugins.PhotoEditorPlugin2" />
+    </js-module>
+    
+    <platform name="android">
+        <config-file parent="/*" target="res/xml/config.xml">
+            <feature name="PhotoEditorPlugin2">
+                <param name="android-package" value="com.outsystems.photoeditorplugin2.PhotoEditorPlugin2" />
+            </feature>
+        </config-file>
+        <config-file parent="/*" target="AndroidManifest.xml">
+            <uses-permission android:name="android.permission.INTERNET" />
+            <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+            <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+            <uses-permission android:name="android.permission.CAMERA" />
+        </config-file>
+        <source-file src="src/android/PhotoEditorPlugin2.java" target-dir="src/com/outsystems/photoeditorplugin2" />
+        
+        <framework src="src/android/external/photoeditorsdk" custom="true" />
+        <framework src="src/android/external/photoeditor" custom="true" />
+    </platform>
+</plugin>
