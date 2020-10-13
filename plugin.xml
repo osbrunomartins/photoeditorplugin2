@@ -21,5 +21,6 @@
         
         <framework src="src/android/external/photoeditorsdk" custom="true" />
         <framework src="src/android/external/photoeditor" custom="true" />
+        <framework src="extented-gradle.gradle" custom="true" type="gradleReference" />
     </platform>
 </plugin>
