@@ -355,9 +355,9 @@ public class PhotoEditorPlugin2 extends CordovaPlugin {
             Log.d("MediaAbstractActivity", "selected camera path "
                     + selectedOutputPath);
             mediaFile = new File(selectedOutputPath);
-            Uri newMethod = FileProvider.getUriForFile(cordovaActivity, cordovaActivity.getApplicationContext().getPackageName()+".provider", mediaFile);
+            //Uri newMethod = FileProvider.getUriForFile(cordovaActivity, cordovaActivity.getApplicationContext().getPackageName()+".provider", mediaFile);
 
-            return newMethod;//Uri.fromFile(mediaFile);
+            return Uri.fromFile(mediaFile);
         } else {
             return null;
         }
