@@ -279,13 +279,13 @@ public class PhotoEditorPlugin2 extends CordovaPlugin {
                 final String selection = "_id=?";
                 final String[] selectionArgs = new String[]{split[1]};
 
-                return getDataColumn(cordovaActivity, contentUri, selection,
+                return GalleryUtils.getDataColumn(cordovaActivity, contentUri, selection,
                         selectionArgs);
             }
         }
         // MediaStore (and general)
         else if ("content".equalsIgnoreCase(uri.getScheme())) {
-            return getDataColumn(cordovaActivity, uri, null, null);
+            return GalleryUtils.getDataColumn(cordovaActivity, uri, null, null);
         }
         // File
         else if ("file".equalsIgnoreCase(uri.getScheme())) {
@@ -305,10 +305,12 @@ public class PhotoEditorPlugin2 extends CordovaPlugin {
                     ActivityCompat.requestPermissions(cordovaActivity,
                             new String[]{android.Manifest.permission.WRITE_EXTERNAL_STORAGE},
                             MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE_CAMERA);
+                            openCamera();
                 } else {
                     ActivityCompat.requestPermissions(cordovaActivity,
                             new String[]{android.Manifest.permission.WRITE_EXTERNAL_STORAGE},
                             MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE_GALLERY);
+                            openGalery();
                 }
             }
         });
