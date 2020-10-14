@@ -34,6 +34,9 @@ import org.json.JSONException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -162,28 +165,9 @@ public class PhotoEditorPlugin2 extends CordovaPlugin {
             case Activity.RESULT_CANCELED:
                 break;
             case Activity.RESULT_OK:
-                if (requestCode == GALLERY_INTENT_CALLED || requestCode == CAMERA_CODE || requestCode == GALLERY_KITKAT_INTENT_CALLED) {
-                    if (requestCode == GALLERY_INTENT_CALLED) {
-                        selectedImageUri = intent.getData();
-                        selectedImagePath = getPath(selectedImageUri);
-                    } else if (requestCode == GALLERY_KITKAT_INTENT_CALLED) {
-                        selectedImageUri = intent.getData();
-                        final int takeFlags = intent.getFlags() & (Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
-                        // Check for the freshest data.
-                        if (selectedImageUri != null) {
-                            cordovaActivity.getContentResolver().takePersistableUriPermission(selectedImageUri, takeFlags);
-                            selectedImagePath = getPath(selectedImageUri);
-                        }
-
-                    }else if(requestCode == CAMERA_CODE){
-                        cordova.setActivityResultCallback(this);
-
-                        selectedImagePath = "";
-                        onPhotoTaken();
-                    } else {
-                        selectedImagePath = selectedOutputPath;
-                    }
-
+                if (requestCode == GALLERY_INTENT_CALLED || requestCode == GALLERY_KITKAT_INTENT_CALLED) {
+                    processResultGallery(requestCode, intent);
+                    /*
                     if (UtilFunctions.stringIsNotEmpty(selectedImagePath)) {
                         // decode image size
                         BitmapFactory.Options o = new BitmapFactory.Options();
@@ -218,25 +202,63 @@ public class PhotoEditorPlugin2 extends CordovaPlugin {
                         BitmapFactory.Options options = new BitmapFactory.Options();
                         options.inSampleSize = scale;
                         bitmap = BitmapFactory.decodeFile(selectedImagePath, options);
+                        //try( InputStream is = new URL(selectedImagePath).openStream() ) {
+
+                            //bitmap = BitmapFactory.decodeStream(is);
+                        //} catch (MalformedURLException e) {
+                            //e.printStackTrace();
+                        //} catch (IOException e) {
+                            //e.printStackTrace();
+                        //}
+
                         _taken = true;
                         onPhotoTaken();
                         System.gc();
                     }
+                    */
+                }else if(requestCode == CAMERA_CODE){
+                    processResultCamera();
                 }else if(requestCode == EDITING_IMAGE){
-                    String imagePath = intent.getStringExtra("imagePath");
-                    if(imagePath != null && imagePath.isEmpty()){
-                        Toast.makeText(cordovaActivity, "Image path is null or empty", Toast.LENGTH_LONG).show();
-                    }
-                    String base64 = getBase64FromPath(imagePath);
-                    if(base64 != null && !base64.isEmpty()) {
-                        callBack.success(base64);
-                    }else{
-                        Toast.makeText(cordovaActivity, "Invalid base64", Toast.LENGTH_LONG).show();
-                    }
+                    processResultEditor(intent);
                 }
                 break;
         }
         super.onActivityResult(requestCode, resultCode, intent);
+    }
+
+    private void processResultGallery(int requestCode, Intent intent){
+        if (requestCode == GALLERY_INTENT_CALLED) {
+            selectedImageUri = intent.getData();
+            selectedImagePath = getPath(selectedImageUri);
+        } else if (requestCode == GALLERY_KITKAT_INTENT_CALLED) {
+            selectedImageUri = intent.getData();
+            final int takeFlags = intent.getFlags() & (Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+            // Check for the freshest data.
+            if (selectedImageUri != null) {
+                cordovaActivity.getContentResolver().takePersistableUriPermission(selectedImageUri, takeFlags);
+                selectedImagePath = getPath(selectedImageUri);
+            }
+            onPhotoTaken();
+        }
+    }
+
+    private void processResultCamera(){
+        cordova.setActivityResultCallback(this);
+        selectedImagePath = "";
+        onPhotoTaken();
+    }
+
+    private void processResultEditor(Intent intent){
+        String imagePath = intent.getStringExtra("imagePath");
+        if(imagePath != null && imagePath.isEmpty()){
+            Toast.makeText(cordovaActivity, "Image path is null or empty", Toast.LENGTH_LONG).show();
+        }
+        String base64 = getBase64FromPath(imagePath);
+        if(base64 != null && !base64.isEmpty()) {
+            callBack.success(base64);
+        }else{
+            Toast.makeText(cordovaActivity, "Invalid base64", Toast.LENGTH_LONG).show();
+        }
     }
 
 
@@ -305,12 +327,12 @@ public class PhotoEditorPlugin2 extends CordovaPlugin {
                     ActivityCompat.requestPermissions(cordovaActivity,
                             new String[]{android.Manifest.permission.WRITE_EXTERNAL_STORAGE},
                             MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE_CAMERA);
-                            openCamera();
+                    openCamera();
                 } else {
                     ActivityCompat.requestPermissions(cordovaActivity,
                             new String[]{android.Manifest.permission.WRITE_EXTERNAL_STORAGE},
                             MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE_GALLERY);
-                            openGalery();
+                    openGalery();
                 }
             }
         });
@@ -359,7 +381,7 @@ public class PhotoEditorPlugin2 extends CordovaPlugin {
             mediaFile = new File(selectedOutputPath);
             Uri newMethod = FileProvider.getUriForFile(cordovaActivity, cordovaActivity.getApplicationContext().getPackageName()+".provider", mediaFile);
 
-            return newMethod; //Uri.fromFile(mediaFile);
+            return newMethod;//Uri.fromFile(mediaFile);
         } else {
             return null;
         }
